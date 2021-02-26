@@ -155,11 +155,11 @@ int lcd_ili93xx_get_height(lcd_ili93xx_driver_t *driver, int16_t *height);
  * Fill specified area with a color.
  *
  * @param driver
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- * @param color
+ * @param x1 left rectangle coordinate (inclusive)
+ * @param y1 upper rectangle coordinate (inclusive)
+ * @param x2 right rectangle coordinate (inclusive)
+ * @param y2 bottom rectangle coordinate (inclusive)
+ * @param color rectangle color
  * @return zero on success, otherwise non-zero value
  */
 int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
@@ -168,23 +168,40 @@ int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_
  * Fill specified area.
  *
  * @param driver
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- * @param color
+ * @param x1 left rectangle coordinate (inclusive)
+ * @param y1 upper rectangle coordinate (inclusive)
+ * @param x2 right rectangle coordinate (inclusive)
+ * @param y2 bottom rectangle coordinate (inclusive)
+ * @param color 2d array with rectangle pixels
  * @return zero on success, otherwise non-zero value
  */
 int lcd_ili93xx_fill_rect(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data);
 
-inline uint16_t lcd_ili93xx_rgb565_convert(uint8_t red, uint8_t green, uint8_t blue)
-{
+/**
+ * Helper function to convert RGB color to RGB565 one.
+ *
+ * @param red red component from 0 to 255
+ * @param green green component from 0 to 255
+ * @param blue blue component from 0 to 255
+ * @return RGB565 color
+ */
+inline uint16_t lcd_ili93xx_rgb565_convert(uint8_t red, uint8_t green, uint8_t blue) {
     return (((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3));
 }
 
+/**
+ * Helper macros to convert RGB color to RGB565 one.
+ *
+ * @param red red component from 0 to 255
+ * @param green green component from 0 to 255
+ * @param blue blue component from 0 to 255
+ * @return RGB565 color
+ */
 #define LCD_ILI93XX_RGB565_CONVERT_M(red, green, blue) (((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3))
 
-// Some color constants
+/**
+ * Color constants.
+ */
 enum lcd_ili93xx_colors {
     LCD_ILI93XX_COLOR_BLACK = LCD_ILI93XX_RGB565_CONVERT_M(0x00, 0x00, 0x00),
     LCD_ILI93XX_COLOR_MAROON = LCD_ILI93XX_RGB565_CONVERT_M(0x80, 0x00, 0x00),

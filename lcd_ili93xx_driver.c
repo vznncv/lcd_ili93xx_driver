@@ -21,8 +21,7 @@
 #define ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_START 0x0052
 #define ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_END 0x0053
 
-int lcd_ili93xx_init_clear(lcd_ili93xx_driver_t *driver)
-{
+int lcd_ili93xx_init_clear(lcd_ili93xx_driver_t *driver) {
     driver->user_data = NULL;
     driver->reset = NULL;
     driver->read_reg = NULL;
@@ -35,21 +34,19 @@ int lcd_ili93xx_init_clear(lcd_ili93xx_driver_t *driver)
     return 0;
 }
 
-static int ili93xx_lcd_test_write_reg(lcd_ili93xx_driver_t *driver, uint16_t test_reg_addr, uint16_t test_vals[2])
-{
+static int ili93xx_lcd_test_write_reg(lcd_ili93xx_driver_t *driver, uint16_t test_reg_addr, uint16_t test_vals[2]) {
     uint16_t act_val = 0;
     for (int i = 0; i < 2; i++) {
         driver->write_reg(driver->user_data, test_reg_addr, test_vals[i]);
         driver->read_reg(driver->user_data, test_reg_addr, &act_val);
         if (act_val != test_vals[i]) {
-            return -3;
+            return -4;
         }
     }
     return 0;
 }
 
-int lcd_ili93xx_init(lcd_ili93xx_driver_t *driver)
-{
+int lcd_ili93xx_init(lcd_ili93xx_driver_t *driver) {
     int err;
 
     if (driver->_is_initialized) {
@@ -273,20 +270,17 @@ int lcd_ili93xx_init(lcd_ili93xx_driver_t *driver)
     return 0;
 }
 
-int lcd_ili93xx_get_height(lcd_ili93xx_driver_t *driver, int16_t *height)
-{
+int lcd_ili93xx_get_height(lcd_ili93xx_driver_t *driver, int16_t *height) {
     *height = driver->_height;
     return 0;
 }
 
-int lcd_ili93xx_get_width(lcd_ili93xx_driver_t *driver, int16_t *width)
-{
+int lcd_ili93xx_get_width(lcd_ili93xx_driver_t *driver, int16_t *width) {
     *width = driver->_width;
     return 0;
 }
 
-int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
-{
+static int lcd_ili93xx_prepare_area(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
     // set window
     if (x1 > x2) {
         int16_t x_tmp = x1;
@@ -302,12 +296,17 @@ int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_
     driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR, x1);
     driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR, y1);
     driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR_START, x1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR_END, x2 - 1);
+    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR_END, x2);
     driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_START, y1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_END, y2 - 1);
+    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_END, y2);
 
-    // prepare buffer
-    size_t total_pixes = (x2 - x1) * (y2 - y1);
+    return (x2 - x1 + 1) * (y2 - y1 + 1);
+}
+
+int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
+    // prepare area to draw
+    int total_pixes = lcd_ili93xx_prepare_area(driver, x1, y1, x2, y2);
+
     const size_t max_buff_size = 128;
     size_t buff_size = total_pixes < max_buff_size ? total_pixes : max_buff_size;
     uint16_t buff[buff_size];
@@ -325,29 +324,10 @@ int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_
     return 0;
 }
 
-int lcd_ili93xx_fill_rect(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data)
-{
-    // set window
-    if (x1 > x2) {
-        int16_t x_tmp = x1;
-        x1 = x2;
-        x2 = x_tmp;
-    }
-    if (y1 > y2) {
-        int16_t y_tmp = y1;
-        y1 = y2;
-        y2 = y_tmp;
-    }
-    // set gram coordinates
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR, x1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR, y1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR_START, x1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_X_ADDR_END, x2 - 1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_START, y1);
-    driver->write_reg(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_Y_ADDR_END, y2 - 1);
-
-    // write pixels
-    size_t total_pixes = (x2 - x1) * (y2 - y1);
+int lcd_ili93xx_fill_rect(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data) {
+    // prepare area to draw
+    int total_pixes = lcd_ili93xx_prepare_area(driver, x1, y1, x2, y2);
+    // flush pixels
     driver->write_words(driver->user_data, ILI93XX_LCD_REGISTER_GRAM_WRITE_DATA, colors_data, total_pixes);
 
     return 0;

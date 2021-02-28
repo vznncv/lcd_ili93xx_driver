@@ -51,7 +51,7 @@ extern "C" {
  * 4. Use driver for some operations.
  *
  * @code{.cpp}
- * lcd_ili93xx_fill_rect_color(&lcd_driver, 0, 0, 240, 320, LCD_ILI93XX_COLOR_GREEN);
+ * lcd_ili93xx_fill_area_color(&lcd_driver, 0, 0, 240 - 1, 320 - 1, LCD_ILI93XX_COLOR_GREEN);
  * ...
  * @endcode
  * 
@@ -162,7 +162,7 @@ int lcd_ili93xx_get_height(lcd_ili93xx_driver_t *driver, int16_t *height);
  * @param color rectangle color
  * @return zero on success, otherwise non-zero value
  */
-int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+int lcd_ili93xx_fill_area_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
 
 /**
  * Fill specified area.
@@ -175,7 +175,7 @@ int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_
  * @param color 2d array with rectangle pixels
  * @return zero on success, otherwise non-zero value
  */
-int lcd_ili93xx_fill_rect(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data);
+int lcd_ili93xx_fill_area(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data);
 
 /**
  * Helper function to convert RGB color to RGB565 one.

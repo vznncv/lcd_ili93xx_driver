@@ -303,7 +303,7 @@ static int lcd_ili93xx_prepare_area(lcd_ili93xx_driver_t *driver, int16_t x1, in
     return (x2 - x1 + 1) * (y2 - y1 + 1);
 }
 
-int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
+int lcd_ili93xx_fill_area_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
     // prepare area to draw
     int total_pixes = lcd_ili93xx_prepare_area(driver, x1, y1, x2, y2);
 
@@ -324,7 +324,7 @@ int lcd_ili93xx_fill_rect_color(lcd_ili93xx_driver_t *driver, int16_t x1, int16_
     return 0;
 }
 
-int lcd_ili93xx_fill_rect(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data) {
+int lcd_ili93xx_fill_area(lcd_ili93xx_driver_t *driver, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t *colors_data) {
     // prepare area to draw
     int total_pixes = lcd_ili93xx_prepare_area(driver, x1, y1, x2, y2);
     // flush pixels

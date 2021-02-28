@@ -46,5 +46,5 @@ if (!res) {
 }
 
 // Use driver for some operations.
-lcd_ili93xx_fill_rect_color(&lcd_driver, 0, 0, 240, 320, LCD_ILI93XX_COLOR_GREEN);
+lcd_ili93xx_fill_area_color(&lcd_driver, 0, 0, 240 - 1, 320 - 1, LCD_ILI93XX_COLOR_GREEN);
 ```
